@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+    font-family: 'formular';
+    src: url('fonts/Formular\ Regular.ttf');
+}
+
+/* Custom checkbox buttons */
+.custom-checkboxes input[type="checkbox"]:not(:checked), 
+.custom-checkboxes input[type="checkbox"]:checked {
+  position: absolute;
+  left: -9999%;
+}
+.custom-checkboxes input[type="checkbox"]:checked + label {
+    border: #4262FF;
+    color: white;
+    background-color: #4262FF;
+  }
+  
+.custom-checkboxes input[type="checkbox"] + label {
+    display: inline-block;
+    padding: 5px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    font-size: 8px;
+    width:30px;
+    text-align: center;
+    border: 1px solid #808080;
+    color: #808080;
+    background-color: white;
+    border-radius: 8px;
+  }
+
+/* A/B */
+.ab-testing input[type="checkbox"]:not(:checked), 
+.ab-testing input[type="checkbox"]:checked {
+    position: absolute;
+    left: -9999%;
+  }
+.ab-testing input[type="checkbox"]:checked + label {
+    border: #4262FF;
+    color: white;
+    background-color: #4262FF;
+}
+
+.ab-testing input[type="checkbox"] + label {
+    display: inline-block;
+    padding: 5px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    font-size: 8px;
+    width:55px;
+    text-align: center;
+    border: 1px solid #808080;
+    color: #808080;
+    background-color: white;
+    border-radius: 8px;
+}

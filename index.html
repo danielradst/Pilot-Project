@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Journey Editor</title>
+    <link rel="stylesheet" href="tailwind.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/alyssaxuu/flowy/flowy.min.css"> 
+</head>
+<!-- 
+  WORK NOTES: (main 1280-800px design res)
+- All of the img's could be swapped with svg so they could be easily animated.
+- Font sizes, margins, padding in the file are very strange for example(17.88px or 27.43px). Quite unusual and outside of the idea behind 
+  tailwind I believe. That's why I have used more standart values very close to the planned ones.
+- Delay & A/B test views are with the class "hidden" as they will appear once the according box is dragged / clicked.  
+- For the journey canvas I'm using flowchart js lib - https://github.com/alyssaxuu/flowy
+  Additionally we can create all variations of the draggable blocks and update the sidebar options depending on the screen & clicked item in script.js
+   
+  Missing Design & Functionality Features:
+- Progressbar - is missing the dot in the end of the progress as well as the dot in the end of the bar. 
+- The icons of each draggable block on the sidebar of canvas are missing because I couldn't download them. 
+- Didn't have enough time to create the interactions between draggable blocks. (lines)
+- Zooming feature is missing, it could be added with vanila js (only html & stylisation atm).
+- Time Delay & A/B Testing Cards have some small css that needs to be fixed, didn't have enough time for it. 
+- Menu Dropdown functionality added however not fully stylised.
+-->
+<body class="bg-body font-opensans pb-12">
+
+    <!-- Header -->
+    <header class="bg-container font-roboto drop-shadow-sm h-18 py-4">
+        <div class="container flex flex-row justify-between items-center mx-auto px-8 md:px-4 lg:px-20 w-full">
+
+            <!-- Content Left -->
+            <div class="text-lg flex space-x-12 items-center">
+
+                <!-- LOGO -->
+                <a class="" href="#"><img class="inline w-10 " src="img/logo.png">
+                  <h2 class="inline align-middle text-blue text-xl font-bold pl-2">LOGO</h2>
+                </a>
+                
+                <!-- SEARCH BAR -->
+                <div class="relative">
+                    <button type="submit" class=" text-navi absolute left-2 top-1/2 -translate-y-1/2">
+                        <svg class="fill-navy text-gray-600 h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg"
+                          xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px"
+                          viewBox="0 0 56.966 56.966" style="enable-background:new 0 0 56.966 56.966;" xml:space="preserve"
+                          width="512px" height="512px">
+                          <path
+                            d="M55.146,51.887L41.588,37.786c3.486-4.144,5.396-9.358,5.396-14.786c0-12.682-10.318-23-23-23s-23,10.318-23,23  s10.318,23,23,23c4.761,0,9.298-1.436,13.177-4.162l13.661,14.208c0.571,0.593,1.339,0.92,2.162,0.92  c0.779,0,1.518-0.297,2.079-0.837C56.255,54.982,56.293,53.08,55.146,51.887z M23.984,6c9.374,0,17,7.626,17,17s-7.626,17-17,17  s-17-7.626-17-17S14.61,6,23.984,6z" />
+                        </svg>
+                    </button>
+
+                    <input class="border-2 border-editor rounded-lg bg-white h-10 pl-10 pr-3 min-w-[263px] font-opensans placeholder-dark text-[12px] text-dark focus:outline-none w-full "
+                    type="search" name="search" placeholder="Search">
+                </div>
+            </div>
+            
+            <!-- Content Right -->
+            <div class="hidden md:flex  items-center flew-wrap justify-between">
+
+              <!-- Website Dropdown -->
+              <div @click.away="open = false" class="relative flex-auto" x-data="{ open: false }">
+
+                  <button @click="open = !open" class="flex flex-row items-center w-full px-4 py-2 mt-2 text-sm font-semibold text-left bg-transparent rounded-lg first-letter:md:w-auto md:mt-0 md:ml-4 hover:text-gray-900 focus:text-gray-900 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline">
+                    <span class="font-normal text-xs align-middle flex items-center">
+                      <img class="inline h-10 mr-1.5" src="img/webpage-logo.png"><div class="inline md:hidden lg:block"> blostive.nl </div></span>
+                    <svg fill="currentColor" viewBox="0 0 20 20" :class="{'rotate-180': open, 'rotate-0': !open}" class="inline w-4 h-4 mt-1 ml-1 transition-transform duration-200 transform md:-mt-1"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                  </button>
+
+                  <div x-show="open" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="transform opacity-0 scale-95" x-transition:enter-end="transform opacity-100 scale-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="transform opacity-100 scale-100" x-transition:leave-end="transform opacity-0 scale-95" class="absolute right-0 w-full mt-2 origin-top-right rounded-md shadow-lg md:w-48">
+                    <div class="px-2 py-2 bg-white rounded-md shadow ">
+                      <a class="table px-4 py-2 mt-2 text-xs font-semibold bg-transparent rounded-lg md:mt-0 hover:text-gray-900 focus:text-gray-900 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline selected" href="#">blostive.nl</a>
+                      <a class="table px-4 py-2 mt-2 text-xs font-semibold bg-transparent rounded-lg md:mt-0 hover:text-gray-900 focus:text-gray-900 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline" href="#">blostive.co.uk</a>
+                      <a class="table px-4 py-2 mt-2 text-xs font-semibold bg-transparent rounded-lg md:mt-0 hover:text-gray-900 focus:text-gray-900 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline" href="#">blostive.de</a>
+                      <a class="table px-4 py-2 mt-2 text-xs font-semibold bg-transparent rounded-lg md:mt-0 hover:text-gray-900 focus:text-gray-900 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline" href="#">+ Add Store</a>
+                    </div>
+                  </div>
+              </div> 
+              
+              <!-- Messages -->
+              <div class="flex align-middle flex-auto content-center items-center  mx-0">
+                <a class="px-4 border-x border-separator" href="#"><img class="inline h-6" src="img/mail.png"></a>
+              </div>  
+              
+              <!-- Account Dropdown -->
+              <div @click.away="open = false" class="relative flex-auto" x-data="{ open: false }">
+                  <button @click="open = !open" class="flex flex-row items-center w-full align-middle py-2 mt-2 text-sm font-semibold text-left bg-transparent rounded-lg md:w-auto md:mt-0 md:ml-4 hover:text-gray-900 focus:text-gray-900 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline">
+                    <span class="font-normal text-xs align-middle flex items-center">
+                      <img class="inline h-10 mr-1.5" src="img/profile.png"><div class="inline md:hidden lg:block">Customer</div></span>
+                    </span>
+                    <svg fill="currentColor" viewBox="0 0 20 20" :class="{'rotate-180': open, 'rotate-0': !open}" class="inline w-4 h-4 mt-1 ml-1 transition-transform duration-200 transform md:-mt-1"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                  </button>
+                  <div x-show="open" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="transform opacity-0 scale-95" x-transition:enter-end="transform opacity-100 scale-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="transform opacity-100 scale-100" x-transition:leave-end="transform opacity-0 scale-95" class="absolute right-0 w-full mt-2 origin-top-right rounded-md shadow-lg md:w-48">
+                    <div class="px-2 py-2 bg-white rounded-md shadow ">
+                      <a class="table px-4 py-2 mt-2 text-xs font-semibold bg-transparent rounded-lg md:mt-0 hover:text-gray-900 focus:text-gray-900 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline selected" href="#">Customer 2</a>
+                      <a class="table px-4 py-2 mt-2 text-xs font-semibold bg-transparent rounded-lg md:mt-0 hover:text-gray-900 focus:text-gray-900 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline" href="#">Customer 3</a>
+                   </div>
+                  </div>
+              </div> 
+            </div>
+
+        </div>
+    </header>
+
+    <!-- First row - Campaign Info & Action Buttons -->
+    <div class="bg-container py-4 my-0.5 flex flex-row flex-wrap justify-between items-center mx-auto px-4 md:px-8 lg:px-18 xl:px-20 w-full">
+        
+      <!-- Title & Edit -->
+      <div class="align-middle"> 
+        <h1 class="align-middle inline text-2xl font-formular font-semibold" >Name of Campaign No.1</h1>
+        <img class="inline w-[17px] ml-5" src="img/edit.png">
+      </div>
+
+      <!-- Saved -->
+      <div class="leading-[4px]">
+        <img class="w-[19px] m-auto align-middle text-center " src="img/checkmark.png">
+        <span class="text-[8px]">Saved</span>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="w-[19rem]">
+        <div class="flex py-3"> 
+          <div class=" h-2.5 text-right rounded-[10px]  text-[11px] font-bold text-navi w-1/2">Journey Editor</div>
+          <div class=" h-2.5 text-right rounded-[10px]  text-[11px] font-bold text-navi w-1/2">Overview</div>
+        </div>
+        <div class="w-full flex flex-row bg-editor mb-6 border-50 rounded-[10px] h-[10px]">
+          <div class="bg-blue h-2.5 rounded-[10px] w-[40%]"></div>
+          <div class="relative h-2.5 rounded-full text-right font-bold w-[59%] text-blue"><span class="hidden">.</span></div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div>
+            <a class="px-2" href="#"><button class="font-bold text-xs px-2 py-2 rounded bg-white border-2 border-blue text-blue">
+              <img class="inline w-[14px] mr-2" src="img/stats.png">
+              <span class="align-middle">Show Analytics</span>
+            </button></a>
+            <a class="px-2" href="#"><button class="font-bold text-xs px-2 py-2 rounded bg-white border-2 border-blue text-blue">Save & Exit</button></a>
+            <a class="px-2" href="#"><button class="font-bold text-xs px-2 py-2 rounded bg-blue border-2 border-blue text-white">Start Automation</button></a>
+      </div>
+    </div>
+
+    <!-- Journey Editor Canvas -->
+    <div class="bg-[url('img/tile.png')] min-h-fit bg-repeat bg-[length:300px_300px;]" id="canvas">
+      
+      <!-- Build Your Flow Card  -->
+      <div class="w-[314px] m-4 px-7 py-4 bg-white rounded-[8px] drop-shadow-[0_1px_16px_rgba(0,0,0,0.1)] font-arial" id="leftcard">
+        <h2 id="header" class="text-lg text-center font-formular font-semibold">Build your Flow</h2> 
+
+        <div class="pb-40" id="blocklist">
+
+          <!-- Messages Category -->
+          <h3 class="text-sm pt-7 text-[13px] text-darkgray font-opensans font-bold">Messages</h3>
+          <div class="blockelem my-3 create-flowy noselect flex align-middle items-center border bg-white border-darkgray rounded ">
+            
+            <input type="hidden" name='blockelemtype' class="blockelemtype" value="1">
+            <div class="blockin w-full flex align-middle items-center pl-[9.5px] py-[6.5px]">
+                <div class="blockico rounded-full bg-body border-body border-[1px]">
+                    <span></span>
+                    <img src="img/eye.svg">
+                </div>
+                <div class="blocktext px-[18px]">
+                    <p class="blocktitle text-[11px]">Email</p>
+                </div>
+            </div>
+            <div class="grabme pr-2">
+              <img src="img/grabme.svg">
+          </div>
+          </div>
+          <div class="blockelem my-3 create-flowy noselect flex align-middle items-center border bg-white border-darkgray rounded ">
+            
+            <input type="hidden" name='blockelemtype' class="blockelemtype" value="2">
+            <div class="blockin w-full flex align-middle items-center pl-[9.5px] py-[6.5px]">
+                <div class="blockico rounded-full bg-body border-body border-[1px]">
+                    <span></span>
+                    <img src="img/eye.svg">
+                </div>
+                <div class="blocktext px-[18px]">
+                    <p class="blocktitle text-[11px]">SMS</p>
+                </div>
+            </div>
+            <div class="grabme pr-2">
+              <img src="img/grabme.svg">
+          </div>
+          </div>
+
+          <!-- Actions Category -->
+          <h3 class="text-sm pt-7 text-[13px] text-darkgray font-opensans font-bold">Actions</h3>
+          <div class="blockelem my-3 create-flowy noselect flex align-middle items-center border bg-e-split border-darkgray rounded ">
+            
+            <input type="hidden" name='blockelemtype' class="blockelemtype" value="3">
+            <div class="blockin w-full flex align-middle items-center pl-[9.5px] py-[6.5px]">
+                <div class="blockico rounded-full bg-body border-body border-[1px]">
+                    <span></span>
+                    <img src="img/eye.svg">
+                </div>
+                <div class="blocktext px-[18px]">
+                    <p class="blocktitle text-[11px]">Conditional Split</p>
+                </div>
+            </div>
+            <div class="grabme pr-2">
+              <img src="img/grabme.svg">
+          </div>
+          </div>
+          <div class="blockelem my-3 create-flowy noselect flex align-middle items-center border bg-e-delay border-darkgray rounded ">
+            
+            <input type="hidden" name='blockelemtype' class="blockelemtype" value="4">
+            <div class="blockin w-full flex align-middle items-center pl-[9.5px] py-[6.5px]">
+                <div class="blockico rounded-full bg-body border-body border-[1px]">
+                    <span></span>
+                    <img src="img/eye.svg">
+                </div>
+                <div class="blocktext px-[18px]">
+                    <p class="blocktitle text-[11px]">Delay</p>
+                </div>
+            </div>
+            <div class="grabme pr-2">
+              <img src="img/grabme.svg">
+          </div>
+          </div>
+          <div class="blockelem my-3 create-flowy noselect flex align-middle items-center border bg-e-abtest border-darkgray rounded ">
+            
+            <input type="hidden" name='blockelemtype' class="blockelemtype" value="6">
+            <div class="blockin w-full flex align-middle items-center pl-[9.5px] py-[6.5px]">
+                <div class="blockico rounded-full bg-body border-body border-[1px]">
+                    <span></span>
+                    <img src="img/eye.svg">
+                </div>
+                <div class="blocktext px-[18px]">
+                    <p class="blocktitle text-[11px]">A/B Test</p>
+                </div>
+            </div>
+            <div class="grabme pr-2">
+              <img src="img/grabme.svg">
+          </div>
+          </div>
+
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="w-full absolute left-1/2 bottom-0 -translate-x-1/2 text-center m-auto pb-4">
+          <a class="px-2" href="#"><button class="font-bold text-xs w-20 px-2 py-2 rounded bg-white border-2 border-blue text-blue">Cancel</button></a>
+          <a class="px-2" href="#"><button class="font-bold text-xs w-20 px-2 py-2 rounded bg-blue border-2 border-blue text-white">Save</button></a>
+        </div>
+      </div>
+
+      <!-- Time Delay Card *hidden* -->
+      <div class="hidden w-[314px] m-4 px-7 py-4 bg-white rounded-[8px] drop-shadow-[0_1px_16px_rgba(0,0,0,0.1)] font-arial">
+        <h2 id="header" class="text-lg text-center font-formular font-semibold">Time Delay</h2> 
+
+        <div class="pb-40">
+
+          <!-- Time Delay 
+            TBD: Input max value should change depending on the timeframe selection
+          -->
+          <h3 class="text-sm pt-7 text-[13px] text-darkgray font-opensans font-bold">Set Time Delay For:</h3>
+          <div class="my-3"> 
+            <input class="bg-white text-darkgray w-[30px] h-[25px] border-e-s-lines border rounded-lg" type="number" id="time-delay" name="time-delay" value="1" min="1" max="31">
+            <select class="bg-white text-darkgray w-2/3 h-[25px] border-e-s-lines border rounded-lg" name="timeframe" id="timeframe" placeholder="">
+              <option value="" disabled selected>- Select -</option>
+              <option value="immediately">Immediately</option>
+              <option value="hours">Hours</option>
+              <option value="days">Days</option>
+              <option value="weeks">Weeks</option>
+            </select>
+          </div>
+
+          <!-- Refinements
+            Custom non-tailwind stylisation because of the :checked selectors - index.css
+          -->
+          <h3 class="text-sm pt-7 text-[13px] text-darkgray font-opensans font-bold">Refinements</h3>
+          <div class="pt-[9px] font-opensans">
+            <input class="align-middle" type="checkbox" id="delay" name="delay" checked> 
+            <label class="text-[11px] text-darkgray" for="delay">Delay until a specific day(s) of the week</label>
+            <div class="custom-checkboxes">
+              <input type="checkbox" id="mon" name="mon" checked>
+              <label for="mon">Mon</label> 
+              <input type="checkbox" id="tues" name="tues" checked>
+              <label for="tues">Tues</label> 
+              <input type="checkbox" id="weds" name="weds" checked>
+              <label for="weds">Weds</label> 
+              <input type="checkbox" id="thurs" name="thurs" checked>
+              <label for="thurs">Thurs</label> 
+              <input type="checkbox" id="fri" name="fri" checked>
+              <label for="fri">Fri</label> 
+              <input type="checkbox" id="sat" name="sat">
+              <label for="sat">Sat</label> 
+              <input type="checkbox" id="sun" name="sun">
+              <label for="sun">Sun</label> 
+            </div>
+          </div>
+   
+
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="w-full absolute left-1/2 bottom-0 -translate-x-1/2 text-center m-auto pb-4">
+          <a class="px-2" href="#"><button class="font-bold text-xs w-20 px-2 py-2 rounded bg-white border-2 border-blue text-blue">Cancel</button></a>
+          <a class="px-2" href="#"><button class="font-bold text-xs w-20 px-2 py-2 rounded bg-blue border-2 border-blue text-white">Save</button></a>
+        </div>
+      </div>
+
+      <!-- A/B Testing Card *hidden* -->
+      <div class="hidden w-[314px] m-4 px-7 py-4 bg-white rounded-[8px] drop-shadow-[0_1px_16px_rgba(0,0,0,0.1)] font-opensans">
+        <h2 id="header" class="text-lg text-center font-formular font-semibold">A/B Testing</h2> 
+        <div class="pb-40">
+          <p class="text-[11px] color pt-7">Decide how to split respondents and accordingly fill paths with messages you want to test.</p>
+          <div class="flex flex-row justify-between align-middle w-full self-stretch">
+            <!-- Custom non-tailwind stylisation because of the :checked selectors - index.css -->
+
+            <!-- Paths  -->
+            <div class="p-2">
+              <h3 class="text-sm pt-7 text-[13px] text-darkgray font-opensans font-bold">Paths</h3>
+              <div class="pt-[9px] font-opensans">
+                
+                <div class="ab-testing">
+                  <input type="checkbox" id="patha" name="patha">
+                  <label for="patha">Path A</label> 
+                  <input type="checkbox" id="pathb" name="pathb">
+                  <label for="pathb">Path B</label> 
+                  <p class="text-[11px] text-darkgray">Add extra path?</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- % Spin -->
+            <div class="p-2">
+              <h3 class="text-sm pt-7 text-[13px] text-darkgray font-opensans font-bold">% Spin</h3>
+              <div class="pt-[9px] font-opensans">
+              
+                <div class="ab-testing">
+                  <input type="checkbox" id="trper" name="trper">
+                  <label for="trper">30%</label> 
+                  <input type="checkbox" id="sevper" name="sevper">
+                  <label for="sevper">70%</label> 
+
+                </div>
+              </div>
+            </div>
+
+            <!-- Select Winner -->
+            <div class="p-2">
+              <h3 class="text-sm pt-7 text-[13px] text-darkgray font-opensans font-bold">Select Winner</h3>
+              <div class="pt-[9px] font-opensans">
+                <a class="m-2" href="#"><button class="font-bold text-xs w-20 px-2 py-2 mb-[10px] rounded text-[9px]  bg-blue border-2 border-blue text-white">Select</button></a>
+                <a class="m-2" href="#"><button class="font-bold text-xs w-20 px-2 py-2 mb-[10px] rounded text-[9px] bg-blue border-2 border-blue text-white">Select</button></a>
+                <a class="m-2" href="#"><button class="font-bold text-xs w-20 px-2 py-2 rounded bg-white text-[9px] border-2 border-blue text-blue">Create New</button></a>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="w-full absolute left-1/2 bottom-0 -translate-x-1/2 text-center m-auto pb-4">
+          <a class="px-2" href="#"><button class="font-bold text-xs w-20 px-2 py-2 rounded bg-white border-2 border-blue text-blue">Cancel</button></a>
+          <a class="px-2" href="#"><button class="font-bold text-xs w-20 px-2 py-2 rounded bg-blue border-2 border-blue text-white">Save</button></a>
+        </div>
+      </div>
+
+      <!-- Zooming buttons *no functionality yet -->
+      <div class="absolute text-center font-arial bottom-0 right-0 px-7 py-4 leading-[5px]">
+        <span class="text-[11px] text-darkgray">100%</span>
+        <span class="m-1.5 w-7 h-7 flex items-center justify-center rounded text-white bg-e-s-lines text-[20px]">+</span>
+        <span class="m-1.5 w-7 h-7 flex items-center justify-center rounded text-white bg-e-s-lines text-[20px]">-</span>
+      </div>
+    </div>
+
+    <!-- Alpine / Flowy / Script.js -->
+    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer=""></script>
+    <script src="https://cdn.jsdelivr.net/gh/alyssaxuu/flowy/flowy.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
